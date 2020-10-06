@@ -12,7 +12,7 @@
     state: absent
   loop: "{{ saltstack_paths }}"
 
-- name: Remove SalkStack installed by pip.
+- name: Remove SaltStack installed by pip.
   pip:
     name: salt
     state: absent

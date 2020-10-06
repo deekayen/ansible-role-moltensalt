@@ -1,5 +1,4 @@
 import os
-import http.client
 import testinfra.utils.ansible_runner
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
@@ -7,11 +6,11 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 def test_saltstack_installed(host):
-    assert host.package("salt-minion").is_installed == False
+    assert not host.package("salt-minion").is_installed
 
 
 def test_saltstack_etc(host):
-    assert host.file("/etc/salt").exists == False
+    assert not host.file("/etc/salt").exists
 
 
 def test_saltstack_logs(host):
@@ -20,7 +19,7 @@ def test_saltstack_logs(host):
         ("/var/log/salt/minion"),
     ):
         log = host.file(filename)
-        assert log.exists == False
+        assert not log.exists
 
 
 def test_saltstack_config(host):
@@ -29,12 +28,11 @@ def test_saltstack_config(host):
         ("/etc/salt/minion"),
     ):
         config = host.file(filename)
-        assert config.exists == False
+        assert not config.exists
 
 
 def test_saltstack_service(host):
     service = host.service("salt-minion")
 
-    assert service.is_enabled == False
-    assert service.is_running == False
-
+    assert not service.is_enabled
+    assert not service.is_running
