@@ -1,0 +1,22 @@
+galaxy_info:
+  role_name: moltensalt
+  author: David Norman
+  description: Remove SaltStack.
+
+  issue_tracker_url: https://github.com/deekayen/ansible-role-moltensalt/issues
+
+  license: BSD
+
+  min_ansible_version: 2.4
+
+  github_branch: master
+
+  platforms:
+    - name: EL
+      versions:
+        - 7
+
+  galaxy_tags:
+  - saltstack
+
+dependencies: []

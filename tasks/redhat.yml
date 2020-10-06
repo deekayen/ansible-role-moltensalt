@@ -1,0 +1,24 @@
+---
+
+- name: Use package manager to remove SaltStack.
+  package:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ saltstack_packages }}"
+
+- name: Ensure specific paths are absent.
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ saltstack_paths }}"
+
+- name: Remove SalkStack installed by pip.
+  pip:
+    name: salt
+    state: absent
+
+- name: Remove SaltStack GPG keys.
+  rpm_key:
+    key: "{{ item }}"
+    state: absent
+  loop: "{{ saltstack_keys }}"
