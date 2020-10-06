@@ -25,4 +25,3 @@
     state: absent
   become: yes
   loop: "{{ saltstack_paths }}"
-
