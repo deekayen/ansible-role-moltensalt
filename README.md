@@ -13,6 +13,18 @@ None.
 Default Variables
 -----------------
 
+    saltstack_keys:
+      - 754A1A7AE731F165D5E6D4BD0E08A149DE57BFBE
+
+    saltstack_packages:
+      - salt
+      - salt-minion
+      - salt-repo
+      - salt-master
+      - salt-ssh
+      - salt-syndic
+      - salt-cloud
+
     saltstack_paths:
       - /etc/bash_completion/salt.bash
       - /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7-Salt
@@ -30,9 +42,6 @@ Default Variables
       - /usr/share/man/man1/salt-call.1.gz
       - /usr/share/man/man1/salt-minion.1.gz
       - /usr/share/man/man1/salt-proxy.1.gz
-
-    puppet_keys:
-      - 754A1A7AE731F165D5E6D4BD0E08A149DE57BFBE
 
 Example Playbook
 ----------------
