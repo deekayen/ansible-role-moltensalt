@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/deekayen/ansible-role-moltensalt.svg?branch=master)](https://travis-ci.org/deekayen/ansible-role-moltensalt)
+[![Build Status](https://travis-ci.org/deekayen/ansible-role-moltensalt.svg?branch=main)](https://travis-ci.org/deekayen/ansible-role-moltensalt)
 
 Molten Salt
 ===========
