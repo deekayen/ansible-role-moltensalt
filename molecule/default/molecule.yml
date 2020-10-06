@@ -20,7 +20,7 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    converge: ../converge.yml
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
   log: True
 verifier:
   name: testinfra
