@@ -16,7 +16,7 @@
 
 - name: Remove apt key for packaging@saltstack.com.
   apt_key:
-    id: 0x754A1A7AE731F165D5E6D4BD0E08A149DE57BFBE
+    id: 754A1A7AE731F165D5E6D4BD0E08A149DE57BFBE
     state: absent
   tags:
     - key
