@@ -86,6 +86,6 @@
 
 - name: On uninstall success.
   debug:
-    msg: "Salt Stack was successfully removed from your computer."
+    msg: "Salt Stack was successfully removed from {{ ansible_hostname }}."
   tags:
     - debug
