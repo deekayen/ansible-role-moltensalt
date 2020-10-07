@@ -1,10 +1,91 @@
 ---
 
-- name: Check for uninstaller executable.
-  win_stat:
-    path: "{{ windows_uninstaller }}"
-  register: uninstall_stat
+# Apparently just running "c:\salt\uninst.exe /S"
+# doesn't do anything for the 2014/2016 releases.
+# So... this explicitly does what I found
+# in the uninstaller source.
+#
+# https://github.com/saltstack/salt/blob/983d20e3bd4cee61ca12a699e43afc2bc0add451/pkg/windows/installer/Salt-Minion-Setup.nsi#L801
 
-- name: Run Windows uninstaller exe.
-  win_command: "{{ windows_uninstaller }} /S"
-  when: uninstall_stat.stat.exists
+- name: Check for salt scripts.
+  win_stat:
+    path: "{{ salt_instdir }}\\bin\\Scripts"
+  register: salt_scripts
+
+- name: "Make sure we're in the right directory."
+  assert:
+    that:
+      - salt_instdir is defined
+      - salt_instdir | trim | length > 1
+      - salt_scripts.stat.exists
+      - salt_scripts.stat.isdir
+    fail_msg: "Salt was not found where it was expected. Adjust the salt_instdir variable."
+    success_msg: "Found salt scripts."
+  tags:
+    - always
+
+- name: Remove the minion service.
+  win_service:
+    name: salt-minion
+    state: absent
+  tags:
+    - service
+
+- name: Remove the master service.
+  win_service:
+    name: salt-master
+    state: absent
+  tags:
+    - service
+
+- name: Remove install and bin files.
+  win_file:
+    path: "{{ salt_instdir }}\\{{ item }}"
+    state: absent
+  loop:
+    - "uninst.exe"
+    - "ssm.exe"
+    - "vcredist.exe"
+    - "bin"
+  tags:
+    - files
+
+- name: Find salt* files in the install path.
+  win_find:
+    paths: "{{ salt_instdir }}"
+    patterns: [ 'salt*' ]
+  register: salt_wildcard
+  tags:
+    - files
+
+- name: Remove salt* files.
+  win_file:
+    path: "{{ item.path }}\\{{ item.filename }}"
+    state: absent
+  loop: "{{ salt_wildcard.files }}"
+  tags:
+    - files
+
+- name: Remove registry entries.
+  win_regedit:
+    path: "HKLM:\\{{ item }}"
+    state: absent
+  loop: "{{ windows_registry_entries }}"
+  tags:
+    - registry
+
+- name: Remove install directory.
+  win_file:
+    path: "{{ salt_instdir }}"
+    state: absent
+  when:
+    - windows_remove_instdir
+    - not ansible_hostname.find('v=' ~ 'Program Files') == -1
+  tags:
+    - files
+
+- name: On uninstall success.
+  debug:
+    msg: "Salt Stack was successfully removed from your computer."
+  tags:
+    - debug

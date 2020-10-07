@@ -1,0 +1,13 @@
+---
+
+salt_instdir: "C:\\salt"
+
+windows_registry_entries:
+  - Software\Microsoft\Windows\CurrentVersion\App Paths\salt-call.exe
+  - Software\Microsoft\Windows\CurrentVersion\App Paths\salt-cp.exe
+  - Software\Microsoft\Windows\CurrentVersion\App Paths\salt-key.exe
+  - Software\Microsoft\Windows\CurrentVersion\App Paths\salt-master.exe
+  - Software\Microsoft\Windows\CurrentVersion\App Paths\salt-minion.exe
+  - Software\Microsoft\Windows\CurrentVersion\App Paths\salt-run.exe
+  - Software\Microsoft\Windows\CurrentVersion\Uninstall\Salt Minion
+  - Software\Microsoft\Windows\CurrentVersion\Uninstall\Salt

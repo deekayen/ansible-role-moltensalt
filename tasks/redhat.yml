@@ -6,6 +6,8 @@
     state: absent
   become: yes
   loop: "{{ saltstack_packages }}"
+  tags:
+    - packages
 
 - name: Remove SaltStack GPG keys.
   rpm_key:
@@ -13,11 +15,15 @@
     state: absent
   become: yes
   loop: "{{ saltstack_keys }}"
+  tags:
+    - key
 
 - name: Remove SaltStack installed by pip.
   pip:
     name: salt
     state: absent
+  tags:
+    - packages
 
 - name: Ensure specific paths are absent.
   file:
@@ -25,3 +31,5 @@
     state: absent
   become: yes
   loop: "{{ saltstack_paths }}"
+  tags:
+    - files
