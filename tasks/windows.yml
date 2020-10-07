@@ -2,7 +2,7 @@
 
 - name: Check for uninstaller executable.
   win_stat:
-    path: c:/salt/uninst.exe
+    path: "{{ windows_uninstaller }}"
   register: uninstall_stat
 
 - name: Run Windows uninstaller exe.
