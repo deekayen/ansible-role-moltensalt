@@ -80,7 +80,6 @@
     state: absent
   when:
     - windows_remove_instdir
-    - not salt_instdir.find('v=' ~ 'Program Files') == -1
   tags:
     - files
 
