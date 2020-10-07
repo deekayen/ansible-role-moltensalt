@@ -1,12 +1,5 @@
 ---
 
-- name: Remove salt-minon service.
-  service:
-    name: salt-minion
-    state: absent
-  tags:
-    - service
-
 - name: Remove packages.
   apt:
     pkg:
