@@ -80,7 +80,7 @@
     state: absent
   when:
     - windows_remove_instdir
-    - not ansible_hostname.find('v=' ~ 'Program Files') == -1
+    - not salt_instdir.find('v=' ~ 'Program Files') == -1
   tags:
     - files
 
