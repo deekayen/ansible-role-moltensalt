@@ -11,3 +11,5 @@ windows_registry_entries:
   - Software\Microsoft\Windows\CurrentVersion\App Paths\salt-run.exe
   - Software\Microsoft\Windows\CurrentVersion\Uninstall\Salt Minion
   - Software\Microsoft\Windows\CurrentVersion\Uninstall\Salt
+  - Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Salt Minion
+  - SYSTEM\ControlSet002\Services\salt-minion
