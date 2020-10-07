@@ -12,9 +12,15 @@ galaxy_info:
   github_branch: main
 
   platforms:
+    - name: Debian
+      versions:
+        - buster
     - name: EL
       versions:
         - 7
+    - name: Ubuntu
+      versions:
+        - focal
     - name: Windows
       versions:
         - 2016

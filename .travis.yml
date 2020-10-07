@@ -9,6 +9,8 @@ env:
     - ROLE_NAME: moltensalt
   jobs:
     - MOLECULE_DISTRO: centos7
+    - MOLECULE_DISTRO: debian10
+    - MOLECULE_DISTRO: ubuntu2004
 
 addons:
   apt:

@@ -1,0 +1,43 @@
+---
+
+- name: Remove salt-minon service.
+  service:
+    name: salt-minion
+    state: absent
+  tags:
+    - service
+
+- name: Remove packages.
+  apt:
+    pkg:
+      - salt-master
+      - salt-minion
+      - salt-ssh
+      - salt-syndic
+      - salt-cloud
+      - salt-api
+    purge: "{{ debian_purge | bool | ternary ('yes', 'no') }}"
+    state: absent
+  tags:
+    - packages
+
+- name: Remove apt key for packaging@saltstack.com.
+  apt_key:
+    id: 0x754A1A7AE731F165D5E6D4BD0E08A149DE57BFBE
+    state: absent
+  tags:
+    - key
+
+- name: Remove package source.
+  file:
+    path: /etc/apt/sources.list.d/saltstack.list
+    state: absent
+  tags:
+    - files
+
+- name: Remove SaltStack installed by pip.
+  pip:
+    name: salt
+    state: absent
+  tags:
+    - packages

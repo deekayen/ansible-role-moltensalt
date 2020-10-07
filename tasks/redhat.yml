@@ -1,5 +1,12 @@
 ---
 
+- name: Remove salt-minon service.
+  service:
+    name: salt-minion
+    state: absent
+  tags:
+    - service
+
 - name: Use package manager to remove SaltStack.
   package:
     name: "{{ item }}"
