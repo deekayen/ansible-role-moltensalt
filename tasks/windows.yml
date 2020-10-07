@@ -60,7 +60,7 @@
 
 - name: Remove salt* files.
   win_file:
-    path: "{{ item.path }}\\{{ item.filename }}"
+    path: "{{ item.path }}"
     state: absent
   loop: "{{ salt_wildcard.files }}"
   tags:
