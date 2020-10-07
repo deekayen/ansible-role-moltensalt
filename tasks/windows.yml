@@ -22,7 +22,7 @@
     fail_msg: "Salt was not found where it was expected. Adjust the salt_instdir variable."
     success_msg: "Found salt scripts."
   tags:
-    - always
+    - validation
 
 - name: Remove the minion service.
   win_service:
