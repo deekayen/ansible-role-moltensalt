@@ -43,6 +43,8 @@ Default Variables
       - /usr/share/man/man1/salt-minion.1.gz
       - /usr/share/man/man1/salt-proxy.1.gz
 
+    windows_uninstaller: "c:\\salt\\uninst.exe"
+
 Example Playbook
 ----------------
 
