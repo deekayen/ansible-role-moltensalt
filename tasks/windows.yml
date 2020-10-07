@@ -53,7 +53,7 @@
 - name: Find salt* files in the install path.
   win_find:
     paths: "{{ salt_instdir }}"
-    patterns: [ 'salt*' ]
+    patterns: ['salt*']
   register: salt_wildcard
   tags:
     - files
