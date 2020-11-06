@@ -43,8 +43,8 @@ jobs:
     strategy:
       matrix:
         distro:
-          - centos8
           - centos7
+          - ubuntu2004
 
     steps:
       - name: Check out the codebase.
