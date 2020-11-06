@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/deekayen/ansible-role-moltensalt.svg?branch=main)](https://travis-ci.org/deekayen/ansible-role-moltensalt) [![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
-
 Molten Salt
 ===========
+
+[![CI](https://github.com/deekayen/ansible-role-moltensalt/workflows/CI/badge.svg)](https://github.com/deekayen/ansible-role-moltensalt/actions?query=workflow%3ACI) [![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
 
 Remove SaltStack, all leftover files, and directories.
 
