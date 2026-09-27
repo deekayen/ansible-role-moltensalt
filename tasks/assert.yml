@@ -1,0 +1,18 @@
+---
+- name: Assert every saltstack_paths entry is an absolute path.
+  ansible.builtin.assert:
+    that:
+      - saltstack_paths | reject('match', '^/.+') | list | length == 0
+    fail_msg: >-
+      Every saltstack_paths entry must be an absolute path, got:
+      {{ saltstack_paths | reject('match', '^/.+') | list }}
+    quiet: true
+
+- name: Assert every saltstack_keys entry is a full 40-hex-digit fingerprint.
+  ansible.builtin.assert:
+    that:
+      - saltstack_keys | reject('match', '^[0-9A-Fa-f]{40}$') | list | length == 0
+    fail_msg: >-
+      Every saltstack_keys entry must be a 40 hex digit fingerprint, got:
+      {{ saltstack_keys | reject('match', '^[0-9A-Fa-f]{40}$') | list }}
+    quiet: true

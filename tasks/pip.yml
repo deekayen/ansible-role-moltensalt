@@ -1,0 +1,17 @@
+---
+# Hosts without pip, or without a pip-installed salt, have nothing to remove.
+- name: Check for a pip-installed salt package.
+  ansible.builtin.command: python3 -m pip show salt
+  register: moltensalt_pip_salt
+  changed_when: false
+  failed_when: false
+  tags:
+    - packages
+
+- name: Remove SaltStack installed by pip.
+  ansible.builtin.pip:
+    name: salt
+    state: absent
+  when: moltensalt_pip_salt.rc == 0
+  tags:
+    - packages

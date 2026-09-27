@@ -1,0 +1,65 @@
+---
+argument_specs:
+  main:
+    short_description: Uninstall SaltStack and remove leftover files.
+    description:
+      - Removes Salt packages (including Salt 3006+ onedir builds), a
+        pip-installed salt, the Salt signing keys, repository definitions,
+        and leftover files and directories on Linux, and the services,
+        files, and registry entries of a Salt minion on Windows.
+    author:
+      - David Norman
+    options:
+      debian_purge:
+        type: bool
+        default: false
+        description: Purge configuration files when removing Debian packages.
+      saltstack_keys:
+        type: list
+        elements: str
+        default:
+          - 754A1A7AE731F165D5E6D4BD0E08A149DE57BFBE
+        description: Fingerprints of Salt signing keys to remove.
+      saltstack_packages:
+        type: list
+        elements: str
+        default:
+          - salt
+          - salt-minion
+          - salt-repo
+          - salt-master
+          - salt-ssh
+          - salt-syndic
+          - salt-cloud
+        description: Package names to remove on RedHat-family hosts.
+      saltstack_paths:
+        type: list
+        elements: path
+        default:
+          - /etc/bash_completion/salt.bash
+          - /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7-Salt
+          - /etc/pki/rpm-gpg/saltstack-signing-key
+          - /etc/salt
+          - /etc/yum.repos.d/salt-2016.11.repo
+          - /usr/bin/spm
+          - /usr/bin/salt-call
+          - /usr/bin/salt-minion
+          - /usr/bin/salt-proxy
+          - /usr/lib/systemd/system/salt-minion.service
+          - /var/cache/salt
+          - /var/log/salt
+          - /usr/lib/python2.7/site-packages/salt
+          - /usr/share/man/man1/salt-call.1.gz
+          - /usr/share/man/man1/salt-minion.1.gz
+          - /usr/share/man/man1/salt-proxy.1.gz
+          - /opt/saltstack
+          - /etc/yum.repos.d/salt.repo
+          - /etc/apt/sources.list.d/salt.sources
+          - /etc/apt/sources.list.d/salt.list
+          - /etc/apt/keyrings/salt-archive-keyring.pgp
+          - /etc/apt/keyrings/salt-archive-keyring.gpg
+        description: Absolute paths to delete on Linux after package removal.
+      windows_remove_instdir:
+        type: bool
+        default: false
+        description: Also delete the Salt install directory on Windows.

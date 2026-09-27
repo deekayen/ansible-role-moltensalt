@@ -1,14 +1,35 @@
 ---
+- name: Validate role variables.
+  ansible.builtin.import_tasks: assert.yml
+  tags:
+    - always
 
-- debug:
+- name: Print the operating system family.
+  ansible.builtin.debug:
     var: ansible_os_family
     verbosity: 2
 
-- include_tasks: debian.yml
+- name: Include Debian-family removal.
+  ansible.builtin.include_tasks: debian.yml
   when: ansible_os_family == "Debian"
 
-- include_tasks: redhat.yml
+- name: Include RedHat-family removal.
+  ansible.builtin.include_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include_tasks: windows.yml
-  when: ansible_connection == "winrm"
+- name: Include pip-installed Salt removal.
+  ansible.builtin.include_tasks: pip.yml
+  when: ansible_os_family in ["Debian", "RedHat"]
+
+- name: Ensure specific paths are absent.
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ saltstack_paths }}"
+  when: ansible_os_family in ["Debian", "RedHat"]
+  tags:
+    - files
+
+- name: Include Windows removal.
+  ansible.builtin.include_tasks: windows.yml
+  when: ansible_os_family == "Windows"

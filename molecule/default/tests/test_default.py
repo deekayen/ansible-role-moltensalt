@@ -1,38 +1,35 @@
+"""Testinfra checks for the moltensalt role."""
+
 import os
-import testinfra.utils.ansible_runner
 
-testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
+import pytest
+import yaml
 
-
-def test_saltstack_installed(host):
-    assert not host.package("salt-minion").is_installed
-
-
-def test_saltstack_etc(host):
-    assert not host.file("/etc/salt").exists
+DEFAULTS = os.path.join(
+    os.path.dirname(__file__), "..", "..", "..", "defaults", "main.yml"
+)
+with open(DEFAULTS) as defaults_file:
+    ROLE_DEFAULTS = yaml.safe_load(defaults_file)
 
 
-def test_saltstack_logs(host):
-    for filename in (
-        ("/var/log/salt/master"),
-        ("/var/log/salt/minion"),
-    ):
-        log = host.file(filename)
-        assert not log.exists
+@pytest.mark.parametrize("name", ["salt", "salt-common", "salt-minion"])
+def test_packages_removed(host, name):
+    assert not host.package(name).is_installed
 
 
-def test_saltstack_config(host):
-    for filename in (
-        ("/etc/salt/master"),
-        ("/etc/salt/minion"),
-    ):
-        config = host.file(filename)
-        assert not config.exists
+def test_salt_commands_gone(host):
+    assert not host.exists("salt-call")
+    assert not host.exists("salt-minion")
 
 
-def test_saltstack_service(host):
-    service = host.service("salt-minion")
+def test_minion_service_gone(host):
+    # Newer systemd exits 4 for a removed unit, which testinfra's
+    # Service.is_enabled rejects, so read the state directly.
+    cmd = host.run("systemctl is-enabled salt-minion.service")
+    assert cmd.stdout.strip() in ("", "not-found", "disabled")
+    assert not host.service("salt-minion").is_running
 
-    assert not service.is_enabled
-    assert not service.is_running
+
+@pytest.mark.parametrize("path", ROLE_DEFAULTS["saltstack_paths"])
+def test_paths_removed(host, path):
+    assert not host.file(path).exists

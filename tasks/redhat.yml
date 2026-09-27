@@ -1,35 +1,15 @@
 ---
-
 - name: Use package manager to remove SaltStack.
-  package:
-    name: "{{ item }}"
+  ansible.builtin.package:
+    name: "{{ saltstack_packages }}"
     state: absent
-  become: yes
-  loop: "{{ saltstack_packages }}"
   tags:
     - packages
 
 - name: Remove SaltStack GPG keys.
-  rpm_key:
+  ansible.builtin.rpm_key:
     key: "{{ item }}"
     state: absent
-  become: yes
   loop: "{{ saltstack_keys }}"
   tags:
     - key
-
-- name: Remove SaltStack installed by pip.
-  pip:
-    name: salt
-    state: absent
-  tags:
-    - packages
-
-- name: Ensure specific paths are absent.
-  file:
-    path: "{{ item }}"
-    state: absent
-  become: yes
-  loop: "{{ saltstack_paths }}"
-  tags:
-    - files

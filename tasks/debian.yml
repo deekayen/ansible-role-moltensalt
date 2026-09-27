@@ -1,7 +1,6 @@
 ---
-
 - name: Remove packages.
-  apt:
+  ansible.builtin.apt:
     pkg:
       - salt-master
       - salt-minion
@@ -9,28 +8,39 @@
       - salt-syndic
       - salt-cloud
       - salt-api
-    purge: "{{ debian_purge | bool | ternary ('yes', 'no') }}"
+      # Base package of the Salt 3006+ onedir builds.
+      - salt-common
+    purge: "{{ debian_purge | bool }}"
     state: absent
   tags:
     - packages
 
-- name: Remove apt key for packaging@saltstack.com.
-  apt_key:
-    id: 754A1A7AE731F165D5E6D4BD0E08A149DE57BFBE
+# apt-key no longer exists on Debian 13 or Ubuntu 26.04, and it cannot run
+# without gpg. Without both, apt-key never added keys to a legacy keyring.
+- name: Check for apt-key.
+  ansible.builtin.stat:
+    path: /usr/bin/apt-key
+  register: moltensalt_apt_key
+
+- name: Check for gpg.
+  ansible.builtin.stat:
+    path: /usr/bin/gpg
+  register: moltensalt_gpg
+
+- name: Remove apt keys for packaging@saltstack.com.
+  ansible.builtin.apt_key:
+    id: "{{ item }}"
     state: absent
+  loop: "{{ saltstack_keys }}"
+  when:
+    - moltensalt_apt_key.stat.exists
+    - moltensalt_gpg.stat.exists
   tags:
     - key
 
 - name: Remove package source.
-  file:
+  ansible.builtin.file:
     path: /etc/apt/sources.list.d/saltstack.list
     state: absent
   tags:
     - files
-
-- name: Remove SaltStack installed by pip.
-  pip:
-    name: salt
-    state: absent
-  tags:
-    - packages

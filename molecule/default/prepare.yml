@@ -1,0 +1,69 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    # EL-family images ship /etc/shadow as mode 0000. On Ubuntu Docker hosts
+    # (GitHub runners) AppArmor denies unix_chkpwd the DAC override it needs
+    # to read it, so sudo and become fail. Only touch images that are 0000.
+    # https://github.com/geerlingguy/docker-rockylinux9-ansible/issues/6
+    - name: Make /etc/shadow readable by root so become works.
+      ansible.builtin.raw: >-
+        [ "$(stat -c %a /etc/shadow)" != 0 ] || chmod 0400 /etc/shadow
+      changed_when: false
+
+# Install Salt the way the Salt Project documents, so the role has a
+# current onedir install to remove.
+- name: Install a Salt minion from the Salt Project repositories
+  hosts: all
+  become: true
+  vars:
+    salt_repo_base: https://github.com/saltstack/salt-install-guide/releases/latest/download
+    salt_key_url: https://packages.broadcom.com/artifactory/api/security/keypair/SaltProjectKey/public
+  tasks:
+    - name: Download the Salt Project apt key.
+      ansible.builtin.get_url:
+        url: "{{ salt_key_url }}"
+        dest: /tmp/salt-archive-keyring.asc
+        mode: "0644"
+      when: ansible_os_family == 'Debian'
+
+    # apt 3 (Ubuntu 26.04) rejects an armored key saved as .pgp, which is
+    # what the Salt install guide does, so store the binary key there.
+    - name: Dearmor the Salt Project apt key.
+      ansible.builtin.command:
+        cmd: >-
+          python3 -c "import base64;
+          armored = open('/tmp/salt-archive-keyring.asc').read();
+          body = armored.split('\n\n', 1)[1].split('-----END')[0].split('\n=')[0];
+          open('/etc/apt/keyrings/salt-archive-keyring.pgp', 'wb').write(base64.b64decode(body))"
+        creates: /etc/apt/keyrings/salt-archive-keyring.pgp
+      when: ansible_os_family == 'Debian'
+
+    - name: Add the Salt Project apt source.
+      ansible.builtin.get_url:
+        url: "{{ salt_repo_base }}/salt.sources"
+        dest: /etc/apt/sources.list.d/salt.sources
+        mode: "0644"
+      when: ansible_os_family == 'Debian'
+
+    - name: Add the Salt Project yum repository.
+      ansible.builtin.get_url:
+        url: "{{ salt_repo_base }}/salt.repo"
+        dest: /etc/yum.repos.d/salt.repo
+        mode: "0644"
+      when: ansible_os_family == 'RedHat'
+
+    - name: Update the apt cache.
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_os_family == 'Debian'
+
+    - name: Install the Salt minion.
+      ansible.builtin.package:
+        name: salt-minion
+        state: present
+
+    - name: Confirm Salt is installed before converge.
+      ansible.builtin.command: salt-call --version
+      changed_when: false
