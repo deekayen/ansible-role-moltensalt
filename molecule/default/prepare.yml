@@ -26,7 +26,7 @@
         url: "{{ salt_key_url }}"
         dest: /tmp/salt-archive-keyring.asc
         mode: "0644"
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
 
     # apt 3 (Ubuntu 26.04) rejects an armored key saved as .pgp, which is
     # what the Salt install guide does, so store the binary key there.
@@ -38,26 +38,26 @@
           body = armored.split('\n\n', 1)[1].split('-----END')[0].split('\n=')[0];
           open('/etc/apt/keyrings/salt-archive-keyring.pgp', 'wb').write(base64.b64decode(body))"
         creates: /etc/apt/keyrings/salt-archive-keyring.pgp
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
 
     - name: Add the Salt Project apt source.
       ansible.builtin.get_url:
         url: "{{ salt_repo_base }}/salt.sources"
         dest: /etc/apt/sources.list.d/salt.sources
         mode: "0644"
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
 
     - name: Add the Salt Project yum repository.
       ansible.builtin.get_url:
         url: "{{ salt_repo_base }}/salt.repo"
         dest: /etc/yum.repos.d/salt.repo
         mode: "0644"
-      when: ansible_os_family == 'RedHat'
+      when: ansible_facts.os_family == 'RedHat'
 
     - name: Update the apt cache.
       ansible.builtin.apt:
         update_cache: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
 
     - name: Install the Salt minion.
       ansible.builtin.package:

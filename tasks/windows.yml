@@ -84,6 +84,6 @@
 
 - name: Report uninstall success.
   ansible.builtin.debug:
-    msg: "Salt Stack was successfully removed from {{ ansible_hostname }}."
+    msg: "Salt Stack was successfully removed from {{ ansible_facts.hostname }}."
   tags:
     - debug
