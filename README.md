@@ -68,6 +68,7 @@ ansible-galaxy install -r requirements.yml
 ## Behavior
 
 - On Debian-family hosts, apt key removal runs only when both `/usr/bin/apt-key` and `/usr/bin/gpg` exist. Debian 13 and Ubuntu 26.04 no longer ship `apt-key`, so the role skips it there. The role also deletes `/etc/apt/sources.list.d/saltstack.list`.
+- Salt 3008.3 and later Debian packages install SysV init scripts. A non-purge `apt remove` leaves those scripts and their `/etc/rc?.d` links, so `systemctl is-enabled salt-minion` still reports `enabled`. The role removes the links with `update-rc.d -f <name> remove`, deletes the `salt-minion`, `salt-master`, `salt-syndic`, and `salt-api` scripts, and reloads systemd when it removed any.
 - The pip check runs `python3 -m pip show salt` and tolerates a missing pip, so hosts without pip or without a pip-installed `salt` skip the pip removal.
 - On Windows, the role asserts that `C:\salt\bin\Scripts` exists before removing anything, and fails the play otherwise. See [Known issues](#known-issues).
 - Unless `windows_remove_instdir` is `true`, `C:\salt` stays on Windows hosts with anything that did not match `uninst.exe`, `ssm.exe`, `vcredist.exe`, `bin`, or `salt*`.
@@ -109,7 +110,7 @@ Use separate plays, with `become` only on the Linux one:
 | `packages` | Package and pip removal. |
 | `key` | Signing key removal. |
 | `files` | Path cleanup on Linux, and file and directory removal on Windows. |
-| `service` | Windows service removal. |
+| `service` | Windows service removal, and leftover Debian init script cleanup. |
 | `registry` | Windows registry cleanup. |
 | `validation` | The Windows install directory assert. |
 | `debug` | The Windows success message. |
@@ -149,7 +150,7 @@ The repository also has a `.pre-commit-config.yaml`; run `pre-commit run --all-f
 | --- | --- |
 | `tasks/main.yml` | Input validation, the per-family includes, and Linux path cleanup. |
 | `tasks/assert.yml` | Checks `saltstack_paths` and `saltstack_keys`, tagged `always`. |
-| `tasks/debian.yml` | apt package, key, and source removal. |
+| `tasks/debian.yml` | apt package, leftover init script, key, and source removal. |
 | `tasks/redhat.yml` | Package and RPM key removal. |
 | `tasks/pip.yml` | Removal of a pip-installed `salt`. |
 | `tasks/windows.yml` | Windows service, file, and registry removal. |

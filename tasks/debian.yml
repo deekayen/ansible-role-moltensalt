@@ -15,6 +15,51 @@
   tags:
     - packages
 
+# Salt 3008.3 and later ship SysV init scripts. Debhelper's postrm only
+# runs "update-rc.d remove" on purge, so a plain remove leaves the
+# conffile and its /etc/rc?.d links, and systemctl still reports the
+# service as enabled through systemd-sysv-install.
+- name: Check for Salt init scripts left behind after package removal.
+  ansible.builtin.stat:
+    path: "/etc/init.d/{{ item }}"
+  loop:
+    - salt-minion
+    - salt-master
+    - salt-syndic
+    - salt-api
+  register: moltensalt_init_scripts
+  tags:
+    - service
+
+- name: Remove runlevel links for leftover Salt init scripts.
+  ansible.builtin.command: "update-rc.d -f {{ item.item }} remove"
+  loop: "{{ moltensalt_init_scripts.results | selectattr('stat.exists') | list }}"
+  loop_control:
+    label: "{{ item.item }}"
+  changed_when: true
+  tags:
+    - service
+
+- name: Remove leftover Salt init scripts.
+  ansible.builtin.file:
+    path: "{{ item.stat.path }}"
+    state: absent
+  loop: "{{ moltensalt_init_scripts.results | selectattr('stat.exists') | list }}"
+  loop_control:
+    label: "{{ item.item }}"
+  register: moltensalt_init_removed
+  tags:
+    - service
+
+- name: Reload systemd so it drops units generated from removed init scripts.
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when:
+    - moltensalt_init_removed is changed
+    - ansible_facts.service_mgr == 'systemd'
+  tags:
+    - service
+
 # apt-key no longer exists on Debian 13 or Ubuntu 26.04, and it cannot run
 # without gpg. Without both, apt-key never added keys to a legacy keyring.
 - name: Check for apt-key.
