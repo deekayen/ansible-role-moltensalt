@@ -109,7 +109,7 @@ Use separate plays, with `become` only on the Linux one:
 | `packages` | Package and pip removal. |
 | `key` | Signing key removal. |
 | `files` | Path cleanup on Linux, and file and directory removal on Windows. |
-| `service` | Windows service removal. |
+| `service` | Windows service removal, and on Linux stopping the minion service and reloading systemd. |
 | `registry` | Windows registry cleanup. |
 | `validation` | The Windows install directory assert. |
 | `debug` | The Windows success message. |
@@ -118,7 +118,7 @@ Input validation in `tasks/assert.yml` is tagged `always`. Only `--skip-tags` wo
 
 ## Known issues
 
-- The `include_tasks` calls in `tasks/main.yml:13`, `:17`, `:21`, and `:34` have no tags. Under `--tags`, Ansible skips an untagged dynamic include, so the tagged tasks inside `debian.yml`, `redhat.yml`, `pip.yml`, and `windows.yml` never run. `--tags files` runs only the Linux path cleanup in `tasks/main.yml`. `--skip-tags` behaves as expected.
+- The `include_tasks` calls in `tasks/main.yml:31`, `:35`, `:39`, and `:61` have no tags. Under `--tags`, Ansible skips an untagged dynamic include, so the tagged tasks inside `debian.yml`, `redhat.yml`, `pip.yml`, and `windows.yml` never run. `--tags files` runs only the Linux path cleanup in `tasks/main.yml`. `--skip-tags` behaves as expected.
 - The Windows assert in `tasks/windows.yml:14-22` requires `C:\salt\bin\Scripts`, and `tasks/windows.yml:40-48` deletes `C:\salt\bin`. A second run against the same host, or a run against a Windows host that never had Salt, fails the assert.
 - That assert's message tells the user to adjust `salt_instdir`, but `salt_instdir` is set in `vars/main.yml:3`. The [variable precedence list](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence) puts role vars above inventory, `group_vars`, and play `vars`, so changing it takes a role parameter set directly on the `roles:` entry, or `-e`.
 
