@@ -30,6 +30,14 @@ def test_minion_service_gone(host):
     assert not host.service("salt-minion").is_running
 
 
+def test_init_script_and_links_gone(host):
+    # Salt 3008.3+ Debian packages leave these behind on a non-purge remove.
+    assert not host.file("/etc/init.d/salt-minion").exists
+    links = host.run("ls /etc/rc0.d /etc/rc1.d /etc/rc2.d /etc/rc3.d "
+                     "/etc/rc4.d /etc/rc5.d /etc/rc6.d 2>/dev/null")
+    assert "salt-minion" not in links.stdout
+
+
 @pytest.mark.parametrize("path", ROLE_DEFAULTS["saltstack_paths"])
 def test_paths_removed(host, path):
     assert not host.file(path).exists
