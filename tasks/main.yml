@@ -9,6 +9,24 @@
     var: ansible_facts.os_family
     verbosity: 2
 
+# Removing the package deletes the unit file but leaves systemd holding the
+# loaded unit and its enable symlink, so is-enabled keeps answering "enabled"
+# until systemd reloads. Stop and disable the minion first.
+- name: Stop and disable the Salt minion service.
+  ansible.builtin.systemd_service:
+    name: salt-minion.service
+    state: stopped
+    enabled: false
+  register: moltensalt_minion_service
+  failed_when:
+    - moltensalt_minion_service is failed
+    - "'Could not find the requested service' not in (moltensalt_minion_service.msg | default(''))"
+  when:
+    - ansible_facts.os_family in ["Debian", "RedHat"]
+    - ansible_facts.service_mgr == "systemd"
+  tags:
+    - service
+
 - name: Include Debian-family removal.
   ansible.builtin.include_tasks: debian.yml
   when: ansible_facts.os_family == "Debian"
@@ -29,6 +47,15 @@
   when: ansible_facts.os_family in ["Debian", "RedHat"]
   tags:
     - files
+
+- name: Reload systemd after removing unit files.
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when:
+    - ansible_facts.os_family in ["Debian", "RedHat"]
+    - ansible_facts.service_mgr == "systemd"
+  tags:
+    - service
 
 - name: Include Windows removal.
   ansible.builtin.include_tasks: windows.yml
